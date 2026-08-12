@@ -7,65 +7,183 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script> 
-  function checkboxes() 
-  {
-var firstName = document.getElementById("fName").value; 
-var lastName = document.getElementById("lName").value; 
-var Email = document.getElementById("EAddress").value; 
-var yesChecked = document.getElementById("agreeYes").checked;
-var noChecked  = document.getElementById("agreeNo").checked;
+ <html>
+<head>
+    <title>Music &amp; Hymnals</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-if(firstName == "")
-{
-document.getElementById ("fName").style.backgroundColor = "red";
-document.getElementById ("fName").focus();
-}
-if(lastName == "")
-{
-document.getElementById ("lName").style.backgroundColor = "red";
-document.getElementById ("lName").focus();
-}
-if(Email == "")
-{
-document.getElementById ("EAddress").style.backgroundColor = "red";
-document.getElementById ("EAddress").focus();
-}
-if(!yesChecked && !noChecked)
-{
-  window.alert("Please Select 'Yes or No' on Terms and Conditions")
- 
-}
+        body {
+            background-image: url("green.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
 
-return valid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
 
-}
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
-</script>
+        a:hover {
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: inherit;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px 0;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+            margin-top: 10px;
+        }
+
+        /* 4 rows by 10 columns = 40 spots, fully transparent, no grid lines */
+        #music-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 20px;
+            width: 90%;
+            max-width: 1400px;
+            margin: 30px auto;
+        }
+
+        .grid-spot {
+            background: transparent;
+            border: none;
+            outline: none;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-spot img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+        }
+
+        .grid-spot.playing img {
+            filter: drop-shadow(0 0 10px white);
+        }
+
+        #now-playing {
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+            min-height: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-
 <body>
- <h1>Contact Us</h1>
-  <form action="nextPage.html" type="Post">
-    First Name: <input type="text" id="fName"><br>
-    Last Name: <input type="text" id="lName"><br>
-    Email Address: <input type="text" id="EAddress"
-    <!-- add another input box -->
-    <button id="mySubmit" type="button" class="btn btn-primary" onclick='checkboxes();'' >Submit</button>
-    <h2>Do you accept the terms and conditions?</h2>
-<input type="checkbox" id="agreeYes" name="Yes" value="Yes">Yes<br>
 
-<input type="checkbox" id ="agreeNo" name="No" value="No">No<br>
+    <nav>
+        <a href="webpage.html">Go to Homepage</a>
+        <a href="Secondpage.html">Go to Artwork Page</a>
+    </nav>
 
+    <h1>Music &amp; Hymnals</h1>
 
+    <div id="now-playing">&nbsp;</div>
 
-  </form>
+    <div id="music-grid"></div>
 
-  <a href="webpage.html">Go to Homepage</a> <br>
-  <a href="Secondpage.html">Go to Short Story and Artwork</a> <br>
-      <a href="FourthPage.html">Go to Portrait Page</a> <br>
-    <a href="6Page.html">Go to Mini Game 2.0</a> <br>
-<a href="5Page.html"> Go to Mini Game</a><br>
+    <audio id="player"></audio>
 
+    <script>
+        // Fill in each slot below with your song info later.
+        // title: name shown in the "now playing" text
+        // src:   path to the audio file (mp3, wav, etc.)
+        // image: path to the image you'll add to represent this song (leave "" for a blank/empty spot)
+        const songs = Array.from({ length: 40 }, () => ({
+            title: "Hello",
+            src: "",
+            image: ""
+        }));
+
+        /* Example of filling in a slot once you have files ready:
+        songs[0] = {
+            title: "Song Name",
+            src: "songs/song1.mp3",
+            image: "images/song1.jpg"
+        };
+        */
+
+        const grid = document.getElementById("music-grid");
+        const player = document.getElementById("player");
+        const nowPlaying = document.getElementById("now-playing");
+        let currentSpot = null;
+
+        songs.forEach((song, index) => {
+            const spot = document.createElement("button");
+            spot.className = "grid-spot";
+            spot.setAttribute("aria-label", song.title || "Empty music slot");
+
+            if (song.image) {
+                const img = document.createElement("img");
+                img.src = song.image;
+                img.alt = song.title || "";
+                spot.appendChild(img);
+            }
+
+            spot.addEventListener("click", () => {
+                if (!song.src) return; // nothing assigned to this slot yet
+
+                if (currentSpot === spot && !player.paused) {
+                    player.pause();
+                    spot.classList.remove("playing");
+                    nowPlaying.innerHTML = "&nbsp;";
+                    currentSpot = null;
+                    return;
+                }
+
+                if (currentSpot) {
+                    currentSpot.classList.remove("playing");
+                }
+
+                player.src = song.src;
+                player.play();
+                spot.classList.add("playing");
+                nowPlaying.textContent = "Now playing: " + song.title;
+                currentSpot = spot;
+            });
+
+            grid.appendChild(spot);
+        });
+
+        player.addEventListener("ended", () => {
+            if (currentSpot) currentSpot.classList.remove("playing");
+            nowPlaying.innerHTML = "&nbsp;";
+            currentSpot = null;
+        });
+    </script>
+
+</body>
+</html>
       
         
        
